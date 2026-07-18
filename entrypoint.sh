@@ -38,7 +38,7 @@ steamcmd_update() {
 
 need_install=0
 [ -x "$GAMEDIR/FactoryServer.sh" ] || need_install=1
-if [ "$need_install" = "1" ] || [ "$(echo "${SKIPUPDATE:-false}" | tr '[:upper:]' '[:lower:]')" != "true" ]; then
+if [ "$need_install" = "1" ] || [ "$(echo "${SKIPUPDATE:-true}" | tr '[:upper:]' '[:lower:]')" != "true" ]; then
   echo "gamectl: installing/updating Satisfactory ($branch) into $GAMEDIR"
   steamcmd_update || { [ "$need_install" = "0" ] && echo "gamectl: WARN update failed, starting existing install" || { echo "ERROR: install failed" >&2; exit 1; }; }
 else

@@ -30,7 +30,7 @@ RUN chmod +x /usr/local/bin/entrypoint
 
 ENV CONFIG_DIR=/config \
     BRANCH=public \
-    SKIPUPDATE=false \
+    SKIPUPDATE=true \
     SERVERGAMEPORT=7777 \
     RELIABLEPORT=8888 \
     MULTIHOME=0.0.0.0 \
