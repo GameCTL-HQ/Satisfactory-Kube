@@ -43,7 +43,13 @@ fi
 # Saves: the server writes to $XDG_CONFIG_HOME (or ~/.config)/Epic/FactoryGame.
 # Anchor that dir onto the volume at /config/saved so saves always persist.
 xdg="${XDG_CONFIG_HOME:-$HOME/.config}"
-mkdir -p "$xdg/Epic"
+# The env may point somewhere unwritable for the run uid; fall back onto the
+# volume (the Epic/FactoryGame symlink anchors saves to /config/saved anyway).
+if ! mkdir -p "$xdg/Epic" 2>/dev/null; then
+  echo "gamectl: WARN $xdg not writable — using $CFG/.steamhome/.config"
+  xdg="$CFG/.steamhome/.config"
+  mkdir -p "$xdg/Epic"
+fi
 if [ ! -L "$xdg/Epic/FactoryGame" ]; then
   rm -rf "$xdg/Epic/FactoryGame"
   ln -s "$CFG/saved" "$xdg/Epic/FactoryGame"

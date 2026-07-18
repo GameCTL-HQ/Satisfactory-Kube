@@ -19,7 +19,8 @@ RUN dpkg --add-architecture i386 && apt-get update \
 RUN mkdir -p /opt/steamcmd && cd /opt/steamcmd \
     && curl -fsSL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar xz \
     && useradd -u 1000 -d /home/steam -m -s /usr/sbin/nologin steam \
-    && chown -R 1000:1000 /opt/steamcmd
+    && mkdir -p /srv/satisfactory \
+    && chown -R 1000:1000 /opt/steamcmd /srv/satisfactory
 
 COPY entrypoint.sh /usr/local/bin/entrypoint
 RUN chmod +x /usr/local/bin/entrypoint
