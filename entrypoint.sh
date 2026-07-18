@@ -15,9 +15,12 @@ reliableport="${RELIABLEPORT:-8888}"
 multihome="${MULTIHOME:-0.0.0.0}"
 
 GAMEDIR="$CFG/gamefiles"
+echo "gamectl: entrypoint starting (config: $CFG)"
 mkdir -p "$GAMEDIR" "$CFG/saved" "$CFG/.steamhome"
 export HOME="$CFG/.steamhome"
-chown -R "$uid:$gid" "$CFG" 2>/dev/null || true
+# No recursive chown: crawling a ~15GB NFS tree stalls boot for minutes and
+# the server only needs write on the mutable paths.
+chown "$uid:$gid" "$CFG" "$CFG/saved" 2>/dev/null || true
 
 steamcmd_update() {
   local beta_args=()
@@ -60,8 +63,6 @@ if [ ! -L "$xdg/Epic/FactoryGame" ]; then
   ln -s "$CFG/saved" "$xdg/Epic/FactoryGame"
 fi
 export XDG_CONFIG_HOME="$xdg"
-
-chown -R "$uid:$gid" "$CFG" 2>/dev/null || true
 
 echo "gamectl: starting Satisfactory — game ${gameport}, reliable ${reliableport}, multihome ${multihome}"
 cd "$GAMEDIR"
