@@ -23,9 +23,14 @@ steamcmd_update() {
   local beta_args=()
   [ "$branch" = "experimental" ] && beta_args=(+app_update 1690800 -beta experimental validate) \
                                  || beta_args=(+app_update 1690800 validate)
-  for i in 1 2 3 4 5; do
+  for i in 1 2 3 4 5 6; do
     /opt/steamcmd/steamcmd.sh +force_install_dir "$GAMEDIR" +login anonymous "${beta_args[@]}" +quit && return 0
-    echo "gamectl: steamcmd attempt $i failed (cold-start config race); retrying" >&2
+    echo "gamectl: steamcmd attempt $i failed — clearing appcache and retrying" >&2
+    # "Missing configuration" sticks when the persisted appinfo cache is
+    # poisoned; clear it (and after repeated failures, all steam state —
+    # the game install in $GAMEDIR is untouched, only re-validated).
+    rm -rf "$HOME/Steam/appcache" 2>/dev/null || true
+    [ "$i" -ge 4 ] && { echo "gamectl: resetting steam state in $HOME" >&2; rm -rf "$HOME/Steam" 2>/dev/null || true; }
     sleep 10
   done
   return 1
