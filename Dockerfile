@@ -18,6 +18,9 @@ RUN dpkg --add-architecture i386 && apt-get update \
 # own dir + $HOME).
 RUN mkdir -p /opt/steamcmd && cd /opt/steamcmd \
     && curl -fsSL https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz | tar xz \
+    # Prime steamcmd (self-update + config fetch) at build time so first-boot
+    # app_update never hits the "Missing configuration" cold-start race.
+    && /opt/steamcmd/steamcmd.sh +quit \
     && useradd -u 1000 -d /home/steam -m -s /usr/sbin/nologin steam \
     && mkdir -p /srv/satisfactory \
     && chown -R 1000:1000 /opt/steamcmd /srv/satisfactory
