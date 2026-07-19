@@ -21,6 +21,12 @@ export HOME="$CFG/.steamhome"
 # No recursive chown: crawling a ~15GB NFS tree stalls boot for minutes and
 # the server only needs write on the mutable paths.
 chown "$uid:$gid" "$CFG" "$CFG/saved" 2>/dev/null || true
+# Fix ownership of files dropped onto the share as root (e.g. an operator
+# scp'ing in saves/worlds) — kubelet does not apply fsGroup to NFS volumes,
+# and root-owned data files can break the server in silent ways (see
+# Necesse-Kube d4b719f). Only touches mismatched files; the steamcmd install
+# tree is pruned (large, root-managed, read-only for the run user).
+find "$CFG" \( -path "$CFG/gamefiles" -o -path "$CFG/.steamhome" \) -prune -o ! -user "$uid" -exec chown "$uid:$gid" {} + 2>/dev/null || true
 
 steamcmd_update() {
   local beta_args=()
